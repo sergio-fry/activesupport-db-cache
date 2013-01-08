@@ -1,9 +1,4 @@
-require "activesupport-db-cache/version"
-
-module Activesupport
-  module Db
-    module Cache
-      # Your code goes here...
-    end
-  end
-end
+require "active_record"
+require "active_support"
+require "active_support/cache"
+require "active_support/cache/active_record_store"

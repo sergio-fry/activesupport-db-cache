@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
-require File.expand_path('../lib/activesupport-db-cache/version', __FILE__)
+$:.push File.expand_path("../lib", __FILE__)
+require File.expand_path('../lib/activesupport-db-cache', __FILE__)
 
 Gem::Specification.new do |gem|
   gem.authors       = ["Sergei O. Udalov"]
@@ -13,8 +14,10 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "activesupport-db-cache"
   gem.require_paths = ["lib"]
-  gem.version       = Activesupport::Db::Cache::VERSION
+  gem.version       = ActiveSupport::Cache::ActiveRecordStore::VERSION
 
   gem.add_dependency "activesupport", ">=3.0.0"
+  gem.add_dependency "activerecord", ">=3.0.0"
   gem.add_development_dependency "rspec"
+  gem.add_development_dependency "sqlite3"
 end
