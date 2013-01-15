@@ -4,7 +4,12 @@ module ActiveSupport
     class ActiveRecordStore < Store
       VERSION = "0.0.1"
 
+      # set database url:
+      #   ENV['ACTIVE_RECORD_CACHE_STORE_DATABASE_URL'] = "sqlite3://./db/test2.sqlite3"
       class CacheItem < ActiveRecord::Base
+        self.table_name = ENV['ACTIVE_RECORD_CACHE_STORE_TABLE'] || 'cache_items'
+        establish_connection ENV['ACTIVE_RECORD_CACHE_STORE_DATABASE_URL'] if ENV['ACTIVE_RECORD_CACHE_STORE_DATABASE_URL'].present?
+
         def value
           Marshal.load(self[:value])
         end
@@ -14,7 +19,12 @@ module ActiveSupport
         end
       end
 
+      def clear
+        CacheItem.delete_all
+      end
+
       def delete_entry(key, options)
+        CacheItem.delete_all(:key => key)
       end
 
       def read_entry(key, options)
