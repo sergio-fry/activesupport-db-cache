@@ -5,8 +5,8 @@ require File.expand_path('../lib/activesupport-db-cache', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ["Sergei O. Udalov"]
   gem.email         = ["sergei.udalov@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{ActiveRecord DB Store engine for ActiveSupport::Cache}
+  gem.summary       = %q{ActiveRecord DB Store engine for ActiveSupport::Cache}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($\)
