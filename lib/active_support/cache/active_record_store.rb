@@ -3,7 +3,7 @@ require "base64"
 module ActiveSupport
   module Cache
     class ActiveRecordStore < Store
-      VERSION = "0.0.1"
+      VERSION = "0.0.2"
 
       # set database url:
       #   ENV['ACTIVE_RECORD_CACHE_STORE_DATABASE_URL'] = "sqlite3://./db/test2.sqlite3"
