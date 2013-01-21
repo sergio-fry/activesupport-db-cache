@@ -2,6 +2,13 @@
 
 TODO: Write a gem description
 
+## Features
+
+ * persistent cache store in database
+ * :expire_in option (cache lifetime)
+ * total rows limit
+ * ability to use external databse for cache store
+
 ## Installation
 
 Add this line to your application's Gemfile:

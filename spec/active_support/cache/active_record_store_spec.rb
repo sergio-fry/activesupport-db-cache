@@ -23,8 +23,26 @@ module ActiveSupport
         @store.read("foo")[:a].should eq(123)
       end
 
-      it "should expire entries"
-      it "should use LIMIT"
+      it "should expire entries" do
+        @store.write :foo, 123, :expires_in => 5.minutes
+        @store.read(:foo).should eq(123)
+        Timecop.travel 6.minutes.since do
+          @store.read(:foo).should be_blank
+        end
+      end
+
+      it "should use ITEMS_LIMIT" do
+        silence_warnings { ActiveRecordStore.const_set(:ITEMS_LIMIT, 10) }
+        @store.clear
+
+        15.times do |i|
+          @store.write(i, 123)
+
+          ActiveRecordStore::CacheItem.count
+        end
+
+        ActiveRecordStore::CacheItem.count.should <= 10
+      end
 
       describe "#read" do
         before do

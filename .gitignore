@@ -10,6 +10,7 @@ coverage
 db/*.sqlite3
 doc/
 lib/bundler/man
+log
 pkg
 rdoc
 spec/reports
