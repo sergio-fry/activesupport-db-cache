@@ -1,3 +1,4 @@
+require "base64"
 
 module ActiveSupport
   module Cache
@@ -11,7 +12,7 @@ module ActiveSupport
         establish_connection ENV['ACTIVE_RECORD_CACHE_STORE_DATABASE_URL'] if ENV['ACTIVE_RECORD_CACHE_STORE_DATABASE_URL'].present?
 
         def value
-          Marshal.load(self[:value])
+          Marshal.load(Base64.decode64(self[:value]))
         end
 
         def expired?
@@ -33,7 +34,7 @@ module ActiveSupport
 
       def write_entry(key, entry, options)
         item = CacheItem.find_or_initialize_by_key(key)
-        item.value = Marshal.dump(entry.value)
+        item.value = Base64.encode64(Marshal.dump(entry.value))
         item.save
       end
     end
