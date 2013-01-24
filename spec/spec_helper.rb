@@ -8,6 +8,7 @@ ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => 'db/
 ActiveRecord::Base.connection.create_table(:cache_items, :force => true) do |t|
   t.column :key, :string
   t.column :value, :text
+  t.column :meta_info, :text
   t.column :expires_at, :datetime
   t.column :created_at, :datetime
   t.column :updated_at, :datetime

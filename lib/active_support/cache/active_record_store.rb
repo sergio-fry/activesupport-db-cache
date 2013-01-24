@@ -1,4 +1,5 @@
 require "base64"
+require "ostruct"
 
 module ActiveSupport
   module Cache
@@ -14,12 +15,38 @@ module ActiveSupport
         self.table_name = ENV['ACTIVE_RECORD_CACHE_STORE_TABLE'] || 'cache_items'
         establish_connection ENV['ACTIVE_RECORD_CACHE_STORE_DATABASE_URL'] if ENV['ACTIVE_RECORD_CACHE_STORE_DATABASE_URL'].present?
 
+        cattr_accessor :debug_mode
+
+        serialize :meta_info, Hash
+        before_save :init_meta_info, :bump_version
+
+        def debug_mode?
+          debug_mode
+        end
+
+        DEFAULT_META_INFO = { :version => 0, :access_counter => 0 }
+
         def value
-          Marshal.load(::Base64.decode64(self[:value]))
+          Marshal.load(::Base64.decode64(self[:value])) if self[:value].present?
+        end
+
+        def value=(new_value)
+          @raw_value = new_value
+          self[:value] = ::Base64.encode64(Marshal.dump(@raw_value))
         end
 
         def expired?
-          self[:expires_at].try(:past?) || false
+          expires_at.try(:past?) || false
+        end
+
+        private
+
+        def bump_version
+          meta_info[:version] = meta_info[:version] + 1 if value_changed?
+        end
+
+        def init_meta_info
+          self.meta_info = DEFAULT_META_INFO.merge(meta_info)
         end
       end
 
@@ -31,18 +58,31 @@ module ActiveSupport
         CacheItem.delete_all(:key => key)
       end
 
-      def read_entry(key, options)
-        CacheItem.find_by_key(key)
+      def read_entry(key, options={})
+        item = CacheItem.find_by_key(key)
+
+        if debug_mode?
+          item.meta_info[:access_counter] += 1
+          item.meta_info[:access_time] = Time.now
+          item.save
+        end
+
+        item
       end
 
       def write_entry(key, entry, options)
         options = options.clone.symbolize_keys
         item = CacheItem.find_or_initialize_by_key(key)
-        item.value = ::Base64.encode64(Marshal.dump(entry.value))
+        item.debug_mode = debug_mode?
+        item.value = entry.value
         item.expires_at = options[:expires_in].try(:since)
 
         remove_expired_items
         item.save
+      end
+
+      def debug_mode?
+        false
       end
 
       private
