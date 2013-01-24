@@ -10,10 +10,10 @@ coverage
 db/*.sqlite3
 doc/
 lib/bundler/man
-log
+log/*
 pkg
 rdoc
 spec/reports
 test/tmp
 test/version_tmp
-tmp
+tmp/*

@@ -1,10 +1,21 @@
 require 'spec_helper.rb'
+require 'ostruct'
 
-module ActiveSupport
-  module Cache
-    describe ActiveRecordStore do
+include ActiveSupport::Cache
+
+describe ActiveRecordStore do
+  def meta_info_for(key)
+    OpenStruct.new(ActiveRecordStore::CacheItem.find_by_key(key).meta_info)
+  end
+
+  before do
+    @store = ActiveRecordStore.new
+  end
+
+  [true, false].each do |debug_mode|
+    describe "cache use when debug_mode='#{debug_mode}'" do
       before do
-        @store = ActiveRecordStore.new
+        @store.stub(:debug_mode?).and_return(debug_mode)
       end
 
       it "should store numbers" do
@@ -58,6 +69,24 @@ module ActiveSupport
         end
       end
 
+      describe "#fetch" do
+        it "should return calculate if missed" do
+          @store.delete(:foo)
+          obj = mock(:obj)
+          obj.should_receive(:func).and_return(123)
+
+          @store.fetch(:foo) { obj.func }.should eq(123)
+        end
+
+        it "should read data from cache if hit" do
+          @store.write(:foo, 123)
+          obj = mock(:obj)
+          obj.should_not_receive(:func)
+
+          @store.fetch(:foo) { obj.func }.should eq(123)
+        end
+      end
+
       describe "#clear" do
         it "should clear cache" do
           @store.write("foo", 123)
@@ -73,6 +102,34 @@ module ActiveSupport
           @store.write("foo", 123)
           @store.delete("foo")
           @store.read("foo").should be_blank
+        end
+      end
+
+      describe "cache item meta info" do
+        before { @store.clear }
+
+        describe "item version" do
+          it "should be 1 for a new cache item", :filter => true do
+            @store.write(:foo, "foo")
+            meta_info_for(:foo).version.should eq(1)
+          end
+
+          it "should be incremented after cache update" do
+            @store.write(:foo, "bar")
+            meta_info_for(:foo).version.should eq(1)
+
+            @store.write(:foo, "123")
+            meta_info_for(:foo).version.should eq(2)
+
+            @store.write(:foo, "hoo")
+            meta_info_for(:foo).version.should eq(3)
+          end
+
+          it "should not be incremented if no data change" do
+            @store.write(:foo, "bar")
+            @store.write(:foo, "bar")
+            meta_info_for(:foo).version.should eq(1)
+          end
         end
       end
     end
