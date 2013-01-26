@@ -7,7 +7,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["sergei.udalov@gmail.com"]
   gem.description   = %q{ActiveRecord DB Store engine for ActiveSupport::Cache}
   gem.summary       = %q{ActiveRecord DB Store engine for ActiveSupport::Cache}
-  gem.homepage      = ""
+  gem.homepage      = "https://github.com/sergio-fry/activesupport-db-cache"
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
