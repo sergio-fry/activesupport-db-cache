@@ -77,7 +77,8 @@ module ActiveSupport
         item.value = entry.value
         item.expires_at = options[:expires_in].try(:since)
         item.save
-
+      rescue ActiveRecord::RecordNotUnique
+      ensure
         free_some_space
       end
 
