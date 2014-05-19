@@ -36,7 +36,13 @@ module ActiveSupport
         end
 
         def expired?
-          expires_at.try(:past?) || false
+          read_attribute(:expires_at).try(:past?) || false
+        end
+
+        # From ActiveSupport::Cache::Store::Entry
+        # Seconds since the epoch when the entry will expire.
+        def expires_at
+          read_attribute(:expires_at).try(:to_f)
         end
 
         private
