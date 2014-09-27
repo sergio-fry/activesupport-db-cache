@@ -1,0 +1,5 @@
+language: ruby
+install: bundle install
+before_script:
+  - bundle exec rake db:create db:migrate RAILS_ENV=test
+script: bundle exec rspec spec
